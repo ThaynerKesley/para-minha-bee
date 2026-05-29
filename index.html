@@ -6,77 +6,247 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para a Bee ❤️</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Quicksand:wght@400;600;700&family=Dancing+Script:wght@700&display=swap');
+
+        :root {
+            --primary: #d81b60;
+            --primary-grad: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            --bg-grad: linear-gradient(135deg, #ffe5ec 0%, #ffc2d1 50%, #ffe5ec 100%);
+            --text-color: #2d3748;
+            --text-muted: #718096;
+        }
+
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #fce4ec;
-            /* Fundo rosa bem suave */
-            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            background: var(--bg-grad);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Quicksand', sans-serif;
             margin: 0;
             overflow: hidden;
             text-align: center;
+            color: var(--text-color);
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 50px 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(216, 27, 96, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
             position: relative;
             z-index: 10;
-            max-width: 90%;
+            max-width: 480px;
+            width: 90%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(216, 27, 96, 0.12), 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        .icon-bee {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: floatBee 3s ease-in-out infinite;
+        }
+
+        @keyframes floatBee {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
         }
 
         h1 {
-            color: #d81b60;
-            margin-bottom: 30px;
+            font-family: 'Comfortaa', sans-serif;
+            color: #c91854;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .message {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #4a5568;
+            margin-bottom: 35px;
+            font-weight: 600;
         }
 
         .buttons {
             position: relative;
-            height: 60px;
+            height: 70px;
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 20px;
         }
 
         button {
-            padding: 12px 35px;
-            font-size: 18px;
+            padding: 14px 38px;
+            font-size: 17px;
+            font-family: 'Quicksand', sans-serif;
             border: none;
-            border-radius: 8px;
+            border-radius: 50px;
             cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.2s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 15px rgba(216, 27, 96, 0.15);
+            outline: none;
         }
 
         #btn-sim {
-            background-color: #4caf50;
+            background: var(--primary-grad);
             color: white;
+            position: relative;
+            overflow: hidden;
+            animation: pulseSim 2s infinite;
+        }
+
+        #btn-sim::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            transform: rotate(30deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translate(-100%, -100%) rotate(30deg); }
+            100% { transform: translate(100%, 100%) rotate(30deg); }
+        }
+
+        @keyframes pulseSim {
+            0% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 4px 25px rgba(255, 75, 43, 0.5); }
+            100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3); }
         }
 
         #btn-sim:hover {
-            background-color: #388e3c;
+            transform: translateY(-2px) scale(1.08);
+            box-shadow: 0 8px 25px rgba(255, 75, 43, 0.4);
+        }
+
+        #btn-sim:active {
+            transform: translateY(1px) scale(0.98);
         }
 
         #btn-nao {
-            background-color: #f44336;
-            color: white;
-            position: relative;
-            /* Muda para fixed via JS */
+            background-color: #edf2f7;
+            color: var(--text-muted);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            z-index: 99;
+        }
+
+        #btn-nao:hover {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .success-container {
+            padding: 40px 30px;
+        }
+
+        .success-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            color: #d81b60;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .success-message strong {
+            color: #d81b60;
+            font-size: 1.4rem;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .heart {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+            font-size: 20px;
+            animation: floatUp 8s linear infinite;
+            user-select: none;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-10vh) rotate(360deg) scale(1.2);
+                opacity: 0;
+            }
         }
 
         .hidden {
             display: none !important;
         }
 
-        .success-text {
-            color: #d81b60;
-            font-size: 24px;
-            line-height: 1.5;
+        .tip-bubble {
+            position: absolute;
+            bottom: 95px;
+            background: #2d3748;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            animation: fadeInUp 0.3s ease;
+            z-index: 15;
+        }
+
+        .tip-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px 6px 0;
+            border-style: solid;
+            border-color: #2d3748 transparent;
+            display: block;
+            width: 0;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -84,7 +254,11 @@
 <body>
 
     <div class="container" id="main-container">
-        <h1>Bee, você me perdoa? 🥺</h1>
+        <span class="icon-bee">🐝💖</span>
+        <h1>Bee, meu amor... 🥺</h1>
+        <div class="message">
+            Eu sei que às vezes posso falhar, mas meu amor por você é a maior certeza que trago no coração. Você me daria mais uma chance de te fazer sorrir e sermos felizes juntos?
+        </div>
         <div class="buttons">
             <button id="btn-sim">SIM</button>
             <button id="btn-nao">NÃO</button>
@@ -92,9 +266,12 @@
     </div>
 
     <div class="container hidden" id="success-container">
-        <div class="success-text">
-            <strong>Eu sabia! ❤️</strong><br><br>
-            Muito obrigado, Bee. Prometo fazer valer a pena!
+        <div class="success-container">
+            <div class="success-title">Sabia que sim! 🥰🌹</div>
+            <div class="success-message">
+                <strong>O melhor 'SIM' da minha vida! ❤️</strong>
+                Muito obrigado por ser tão incrível e paciente comigo, Bee. Prometo te dar todo o carinho do mundo e fazer cada segundo valer a pena!
+            </div>
         </div>
     </div>
 
@@ -104,36 +281,115 @@
         const mainContainer = document.getElementById('main-container');
         const successContainer = document.getElementById('success-container');
 
-        // Lógica para o botão NÃO fugir
+        let naoClicks = 0;
+        const messagesNao = [
+            "Ué, o botão travou? 😜",
+            "Não adianta tentar! 😂",
+            "Quase lá! Só mais... ops! 🤪",
+            "Que pontaria hein! 🎯",
+            "Duvido você acertar! 😎",
+            "Desiste e clica no SIM! 💕",
+            "Estou fugindo com amor! 🏃‍♂️💨",
+            "Eita, tentou de novo? 🐝"
+        ];
+
+        const showTipBubble = (text) => {
+            const oldBubble = document.querySelector('.tip-bubble');
+            if (oldBubble) oldBubble.remove();
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'tip-bubble';
+            bubble.innerText = text;
+            
+            const buttonsDiv = document.querySelector('.buttons');
+            buttonsDiv.appendChild(bubble);
+            
+            setTimeout(() => {
+                if (bubble.parentNode) bubble.remove();
+            }, 2500);
+        };
+
         const fogeBotao = () => {
-            // Pega as dimensões da janela, subtraindo o tamanho do botão para ele não sair da tela
-            const maxX = window.innerWidth - btnNao.clientWidth - 20;
-            const maxY = window.innerHeight - btnNao.clientHeight - 20;
+            naoClicks++;
+            
+            if (naoClicks % 2 === 0) {
+                const randMsg = messagesNao[Math.floor(Math.random() * messagesNao.length)];
+                showTipBubble(randMsg);
+            }
 
-            const randomX = Math.floor(Math.random() * maxX);
-            const randomY = Math.floor(Math.random() * maxY);
+            const padding = 30;
+            const maxX = window.innerWidth - btnNao.clientWidth - padding;
+            const maxY = window.innerHeight - btnNao.clientHeight - padding;
 
-            // Tira o botão do fluxo da div e o posiciona na tela inteira
+            let randomX = Math.floor(Math.random() * (maxX - padding) + padding);
+            let randomY = Math.floor(Math.random() * (maxY - padding) + padding);
+
             btnNao.style.position = 'fixed';
             btnNao.style.left = `${randomX}px`;
             btnNao.style.top = `${randomY}px`;
+            btnNao.style.transition = 'all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)';
         };
 
-        // Eventos para mouse e toque (mobile)
         btnNao.addEventListener('mouseover', fogeBotao);
         btnNao.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Evita o clique no mobile
+            e.preventDefault();
             fogeBotao();
         });
 
-        // Ação do botão SIM
+        function createHeart(emoji = null) {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            
+            const heartIcons = ['❤️', '💖', '💗', '💕', '🌸', '🐝', '✨'];
+            heart.innerText = emoji || heartIcons[Math.floor(Math.random() * heartIcons.length)];
+            
+            heart.style.left = Math.random() * 100 + 'vw';
+            const size = Math.random() * 20 + 10;
+            heart.style.fontSize = size + 'px';
+            heart.style.opacity = Math.random() * 0.4 + 0.15;
+            
+            const duration = Math.random() * 6 + 6;
+            heart.style.animationDuration = duration + 's';
+            
+            document.body.appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, duration * 1000);
+        }
+
+        setInterval(() => createHeart(), 700);
+
+        function triggerConfetti() {
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('heart');
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    
+                    const celebrationIcons = ['❤️', '💖', '💗', '💕', '✨', '🌸', '🎉', '🌹', '🐝'];
+                    confetti.innerText = celebrationIcons[Math.floor(Math.random() * celebrationIcons.length)];
+                    
+                    const size = Math.random() * 25 + 15;
+                    confetti.style.fontSize = size + 'px';
+                    
+                    const duration = Math.random() * 3 + 2;
+                    confetti.style.animationDuration = duration + 's';
+                    confetti.style.opacity = '1';
+                    
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), duration * 1000);
+                }, i * 30);
+            }
+        }
+
         btnSim.addEventListener('click', () => {
-            // Troca a tela
             mainContainer.classList.add('hidden');
             successContainer.classList.remove('hidden');
+            
+            triggerConfetti();
 
             // --- NOTIFICAÇÃO POR E-MAIL ---
-            // Substitua "SEU_ENDERECO_FORMSPREE" pela URL que o Formspree vai te dar.
             const formspreeURL = 'https://formspree.io/f/SEU_ENDERECO_FORMSPREE';
 
             fetch(formspreeURL, {
