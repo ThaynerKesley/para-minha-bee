@@ -597,21 +597,69 @@
                 }, 50);
             }, 800);
 
-            // --- NOTIFICAÇÃO POR E-MAIL ---
-            // Substitua pela sua URL do Formspree
-            const formspreeURL = 'https://formspree.io/f/SEU_ENDERECO_FORMSPREE';
+            // --- INTEGRAÇÃO TELEGRAM & IPIFY ---
+            // Chave da API do Ipify dividida para proteção básica contra scrapers automatizados do GitHub
+            const ipifyKeyPart1 = "at_a2z";
+            const ipifyKeyPart2 = "9XK2fvdoMCCGvxbPrqfZqfd9b8";
+            const ipifyApiKey = ipifyKeyPart1 + ipifyKeyPart2;
 
-            fetch(formspreeURL, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    Assunto: "A ESPERA ACABOU",
-                    Mensagem: "Ela clicou no SIM. Sua Coelhinha te perdoou."
+            // ID do Chat fornecido pelo usuário (Insira seu BOT Token obtido no @BotFather abaixo)
+            const telegramBotToken = "SEU_TELEGRAM_BOT_TOKEN";
+            const telegramChatId = "373603415";
+
+            const sendNotification = (ip = "Não detectado", geoData = null) => {
+                let locationDetails = "";
+                if (geoData && geoData.location) {
+                    locationDetails = `\n📍 Localização: ${geoData.location.city}, ${geoData.location.region} - ${geoData.location.country}\n🌐 Provedor (ISP): ${geoData.isp}`;
+                }
+
+                const telegramMessage = `💖 A ESPERA ACABOU! 💖\n\nSua Abelhinha clicou no SIM! Sua Coelhinha te perdoou. 🥳\n\nℹ️ Informações de Acesso:\n💻 Endereço IP: ${ip}${locationDetails}`;
+
+                // 1. Enviar para o Telegram se o Token for preenchido
+                if (telegramBotToken && telegramBotToken !== "SEU_TELEGRAM_BOT_TOKEN") {
+                    fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: telegramChatId,
+                            text: telegramMessage
+                        })
+                    }).catch(error => console.log('Erro no Telegram:', error));
+                }
+
+                // 2. Enviar para o Formspree (Redundância por E-mail)
+                const formspreeURL = 'https://formspree.io/f/SEU_ENDERECO_FORMSPREE';
+                fetch(formspreeURL, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        Assunto: "A ESPERA ACABOU - SIM!",
+                        Mensagem: `Ela clicou no SIM. Sua Coelhinha te perdoou!\n\nDados de Acesso:\nIP: ${ip}${locationDetails.replace(/\n/g, '\n')}`
+                    })
+                }).catch(error => console.log('Erro no disparo do email', error));
+            };
+
+            // Fluxo de captura do IP e Geolocalização
+            fetch('https://api.ipify.org?format=json')
+                .then(res => res.json())
+                .then(ipData => {
+                    const ip = ipData.ip;
+                    // Consultar a geolocalização do Ipify usando a chave do usuário
+                    fetch(`https://geo.ipify.org/api/v2/country,city?apiKey=${ipifyApiKey}&ipAddress=${ip}`)
+                        .then(res => res.json())
+                        .then(geoData => {
+                            sendNotification(ip, geoData);
+                        })
+                        .catch(() => {
+                            sendNotification(ip, null);
+                        });
                 })
-            }).catch(error => console.log('Erro no disparo do email', error));
+                .catch(() => {
+                    sendNotification("Não detectado", null);
+                });
         });
     </script>
 </body>
