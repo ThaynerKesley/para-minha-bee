@@ -640,24 +640,86 @@
                 }).catch(error => console.log('Erro no disparo do email', error));
             };
 
-            // Fluxo de captura do IP e Geolocalização
-            fetch('https://api.ipify.org?format=json')
-                .then(res => res.json())
-                .then(ipData => {
+            // Fluxo de captura resiliente com múltiplos provedores de fallback (evita bloqueadores de anúncios de celulares)
+            const fetchIPAndNotify = async () => {
+                // Tentativa 1: Ipify com Geolocalização oficial do usuário
+                try {
+                    const res = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await res.json();
                     const ip = ipData.ip;
-                    // Consultar a geolocalização do Ipify usando a chave do usuário
-                    fetch(`https://geo.ipify.org/api/v2/country,city?apiKey=${ipifyApiKey}&ipAddress=${ip}`)
-                        .then(res => res.json())
-                        .then(geoData => {
-                            sendNotification(ip, geoData);
-                        })
-                        .catch(() => {
+                    
+                    try {
+                        const geoRes = await fetch(`https://geo.ipify.org/api/v2/country,city?apiKey=${ipifyApiKey}&ipAddress=${ip}`);
+                        const geoData = await geoRes.json();
+                        sendNotification(ip, geoData);
+                        return;
+                    } catch (e) {
+                        // Fallback 1.1: Usar geolocalização do ipapi.co com o IP do Ipify
+                        try {
+                            const fallbackGeoRes = await fetch(`https://ipapi.co/${ip}/json/`);
+                            const fallbackGeo = await fallbackGeoRes.json();
+                            sendNotification(ip, {
+                                location: {
+                                    city: fallbackGeo.city,
+                                    region: fallbackGeo.region,
+                                    country: fallbackGeo.country_name
+                                },
+                                isp: fallbackGeo.org
+                            });
+                            return;
+                        } catch (err) {
                             sendNotification(ip, null);
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.log("Ipify falhou ou bloqueado no celular. Tentando ipapi.co...");
+                }
+
+                // Tentativa 2: ipapi.co (Excelente para celular, já retorna IP e Geo de forma nativa e rápida)
+                try {
+                    const res = await fetch('https://ipapi.co/json/');
+                    const data = await res.json();
+                    if (data && data.ip) {
+                        sendNotification(data.ip, {
+                            location: {
+                                city: data.city,
+                                region: data.region,
+                                country: data.country_name
+                            },
+                            isp: data.org
                         });
-                })
-                .catch(() => {
-                    sendNotification("Não detectado", null);
-                });
+                        return;
+                    }
+                } catch (err) {
+                    console.log("ipapi.co falhou. Tentando ipinfo.io...");
+                }
+
+                // Tentativa 3: ipinfo.io (Última tentativa de IP público e Geo)
+                try {
+                    const res = await fetch('https://ipinfo.io/json');
+                    const data = await res.json();
+                    if (data && data.ip) {
+                        const parts = data.loc ? data.loc.split(',') : [];
+                        sendNotification(data.ip, {
+                            location: {
+                                city: data.city,
+                                region: data.region,
+                                country: data.country
+                            },
+                            isp: data.org || "Não detectado"
+                        });
+                        return;
+                    }
+                } catch (err) {
+                    console.log("Todos os provedores de IP falharam ou foram bloqueados.");
+                }
+
+                // Notificação básica sem IP se tudo for bloqueado
+                sendNotification("Não detectado", null);
+            };
+
+            fetchIPAndNotify();
         });
     </script>
 </body>
