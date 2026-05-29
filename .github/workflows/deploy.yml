@@ -1,0 +1,47 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+
+# Define as permissões necessárias para o deploy do Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Permite apenas um deploy ativo por vez
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v4
+
+      # Gera o config.js com as secrets injetadas em tempo de build/deploy
+      - name: Injetar Credenciais no config.js
+        run: |
+          echo "const CONFIG = {
+            TELEGRAM_BOT_TOKEN: '${{ secrets.TELEGRAM_BOT_TOKEN }}',
+            TELEGRAM_CHAT_ID: '${{ secrets.TELEGRAM_CHAT_ID }}',
+            IPIFY_API_KEY: '${{ secrets.IPIFY_API_KEY }}'
+          };" > config.js
+
+      - name: Upload de Artefato do Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy para GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

