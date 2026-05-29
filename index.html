@@ -313,6 +313,7 @@
         const successContainer = document.getElementById('success-container');
 
         let naoClicks = 0;
+        let isFixed = false;
 
         // Mensagens sérias e intensas
         const messagesNao = [
@@ -341,7 +342,7 @@
             }, 2500);
         };
 
-        const fogeBotao = () => {
+        const fogeBotao = (mouseX, mouseY) => {
             naoClicks++;
 
             if (naoClicks % 2 === 0 || naoClicks === 1) {
@@ -349,23 +350,71 @@
                 showTipBubble(randMsg);
             }
 
-            const padding = 20;
-            const maxX = window.innerWidth - btnNao.clientWidth - padding;
-            const maxY = window.innerHeight - btnNao.clientHeight - padding;
+            if (!isFixed) {
+                const rect = btnNao.getBoundingClientRect();
+                btnNao.style.position = 'fixed';
+                btnNao.style.left = `${rect.left}px`;
+                btnNao.style.top = `${rect.top}px`;
+                btnNao.style.margin = '0';
+                isFixed = true;
+            }
 
-            let randomX = Math.floor(Math.random() * (maxX - padding) + padding);
-            let randomY = Math.floor(Math.random() * (maxY - padding) + padding);
+            const padding = 50; // Margem de segurança generosa para o botão nunca sumir
+            const btnWidth = btnNao.offsetWidth || 120;
+            const btnHeight = btnNao.offsetHeight || 50;
 
-            btnNao.style.position = 'fixed';
+            const maxX = window.innerWidth - btnWidth - padding;
+            const maxY = window.innerHeight - btnHeight - padding;
+
+            const safeMaxX = Math.max(padding, maxX);
+            const safeMaxY = Math.max(padding, maxY);
+
+            let randomX = Math.floor(Math.random() * (safeMaxX - padding) + padding);
+            let randomY = Math.floor(Math.random() * (safeMaxY - padding) + padding);
+
+            // Evitar o posicionamento próximo ao mouse ou dedo usando trigonometria
+            if (mouseX !== undefined && mouseY !== undefined) {
+                const dist = Math.hypot(randomX + btnWidth / 2 - mouseX, randomY + btnHeight / 2 - mouseY);
+                if (dist < 180) {
+                    const angle = Math.atan2(randomY + btnHeight / 2 - mouseY, randomX + btnWidth / 2 - mouseX);
+                    randomX = mouseX + Math.cos(angle) * 220 - btnWidth / 2;
+                    randomY = mouseY + Math.sin(angle) * 220 - btnHeight / 2;
+
+                    // Ajusta novamente aos limites de tela seguros
+                    randomX = Math.max(padding, Math.min(randomX, safeMaxX));
+                    randomY = Math.max(padding, Math.min(randomY, safeMaxY));
+                }
+            }
+
             btnNao.style.left = `${randomX}px`;
             btnNao.style.top = `${randomY}px`;
-            btnNao.style.transition = 'all 0.15s ease-out';
+            btnNao.style.transition = 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
         };
 
-        btnNao.addEventListener('mouseover', fogeBotao);
+        // Escuta aproximação do cursor para esquiva pró-ativa
+        document.addEventListener('mousemove', (e) => {
+            if (isSuccess) return;
+
+            const rect = btnNao.getBoundingClientRect();
+            const btnCenterX = rect.left + rect.width / 2;
+            const btnCenterY = rect.top + rect.height / 2;
+
+            const distance = Math.hypot(e.clientX - btnCenterX, e.clientY - btnCenterY);
+
+            // Foge quando o cursor estiver a menos de 95 pixels
+            if (distance < 95) {
+                fogeBotao(e.clientX, e.clientY);
+            }
+        });
+
+        btnNao.addEventListener('mouseover', (e) => {
+            fogeBotao(e.clientX, e.clientY);
+        });
+
         btnNao.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            fogeBotao();
+            const touch = e.touches[0];
+            fogeBotao(touch.clientX, touch.clientY);
         });
 
         // Configuração do Canvas de Partículas Bokeh e Corações
