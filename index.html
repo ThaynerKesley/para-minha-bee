@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para a Bee ❤️</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #fce4ec;
+            /* Fundo rosa bem suave */
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            max-width: 90%;
+        }
+
+        h1 {
+            color: #d81b60;
+            margin-bottom: 30px;
+        }
+
+        .buttons {
+            position: relative;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            padding: 12px 35px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        #btn-sim {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        #btn-sim:hover {
+            background-color: #388e3c;
+        }
+
+        #btn-nao {
+            background-color: #f44336;
+            color: white;
+            position: relative;
+            /* Muda para fixed via JS */
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .success-text {
+            color: #d81b60;
+            font-size: 24px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container" id="main-container">
+        <h1>Bee, você me perdoa? 🥺</h1>
+        <div class="buttons">
+            <button id="btn-sim">SIM</button>
+            <button id="btn-nao">NÃO</button>
+        </div>
+    </div>
+
+    <div class="container hidden" id="success-container">
+        <div class="success-text">
+            <strong>Eu sabia! ❤️</strong><br><br>
+            Muito obrigado, Bee. Prometo fazer valer a pena!
+        </div>
+    </div>
+
+    <script>
+        const btnNao = document.getElementById('btn-nao');
+        const btnSim = document.getElementById('btn-sim');
+        const mainContainer = document.getElementById('main-container');
+        const successContainer = document.getElementById('success-container');
+
+        // Lógica para o botão NÃO fugir
+        const fogeBotao = () => {
+            // Pega as dimensões da janela, subtraindo o tamanho do botão para ele não sair da tela
+            const maxX = window.innerWidth - btnNao.clientWidth - 20;
+            const maxY = window.innerHeight - btnNao.clientHeight - 20;
+
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            // Tira o botão do fluxo da div e o posiciona na tela inteira
+            btnNao.style.position = 'fixed';
+            btnNao.style.left = `${randomX}px`;
+            btnNao.style.top = `${randomY}px`;
+        };
+
+        // Eventos para mouse e toque (mobile)
+        btnNao.addEventListener('mouseover', fogeBotao);
+        btnNao.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Evita o clique no mobile
+            fogeBotao();
+        });
+
+        // Ação do botão SIM
+        btnSim.addEventListener('click', () => {
+            // Troca a tela
+            mainContainer.classList.add('hidden');
+            successContainer.classList.remove('hidden');
+
+            // --- NOTIFICAÇÃO POR E-MAIL ---
+            // Substitua "SEU_ENDERECO_FORMSPREE" pela URL que o Formspree vai te dar.
+            const formspreeURL = 'https://formspree.io/f/SEU_ENDERECO_FORMSPREE';
+
+            fetch(formspreeURL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    Assunto: "🎉 BOA NOTÍCIA!",
+                    Mensagem: "A Bee clicou no SIM! Ela te perdoou."
+                })
+            }).catch(error => console.log('Erro no disparo do email', error));
+        });
+    </script>
+</body>
+
+</html>
